@@ -1,4 +1,7 @@
-FROM jellyfin/jellyfin:latest
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
+WORKDIR /src
+COPY jellyfin-plugin/ ./
+RUN dotnet build Jellyfin.Plugin.ScraperBridge.csproj -c Release -o /out
 
-ARG PLUGIN_VERSION=1.0.0.0
-COPY docker/plugins/Jellyfin.Plugin.ScraperBridge.dll /config/plugins/ScraperBridge_${PLUGIN_VERSION}/
+FROM jellyfin/jellyfin:latest
+COPY --from=builder /out/Jellyfin.Plugin.ScraperBridge.dll /config/plugins/ScraperBridge_1.0.0.0/

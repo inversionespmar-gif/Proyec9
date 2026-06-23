@@ -2,7 +2,7 @@ services:
   - type: web
     name: scraper-api
     runtime: docker
-    repo: https://github.com/your/repo
+    repo: https://github.com/inversionespmar-gif/Proyec9
     branch: main
     dockerfilePath: ./scraper-api/Dockerfile
     envVars:
@@ -25,7 +25,7 @@ services:
   - type: web
     name: jellyfin
     runtime: docker
-    repo: https://github.com/your/repo
+    repo: https://github.com/inversionespmar-gif/Proyec9
     branch: main
     dockerfilePath: ./docker/Dockerfile.jellyfin
     envVars:
