@@ -1,8 +1,8 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
+COPY scraper-api/package*.json ./
 RUN npm install
-COPY . .
+COPY scraper-api/ . .
 RUN npm run build
 
 FROM node:20-alpine

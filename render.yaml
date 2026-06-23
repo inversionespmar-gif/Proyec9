@@ -5,7 +5,6 @@ services:
     repo: https://github.com/inversionespmar-gif/Proyec9
     branch: main
     dockerfilePath: ./scraper-api/Dockerfile
-    dockerContext: ./scraper-api
     envVars:
       - key: PORT
         value: "3000"
