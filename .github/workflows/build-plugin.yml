@@ -1,0 +1,37 @@
+name: Build Jellyfin Plugin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jellyfin-plugin/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore jellyfin-plugin/Jellyfin.Plugin.ScraperBridge.csproj
+
+      - name: Build
+        run: dotnet build jellyfin-plugin/Jellyfin.Plugin.ScraperBridge.csproj -c Release
+
+      - name: Copy plugin DLL
+        run: |
+          mkdir -p docker/plugins
+          cp jellyfin-plugin/bin/Release/net8.0/Jellyfin.Plugin.ScraperBridge.dll docker/plugins/
+
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jellyfin-plugin
+          path: docker/plugins/Jellyfin.Plugin.ScraperBridge.dll

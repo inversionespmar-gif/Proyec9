@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: scraper-api
+    runtime: docker
+    repo: https://github.com/your/repo
+    branch: main
+    dockerfilePath: ./scraper-api/Dockerfile
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: TARGET_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: scraper-cache
+          property: connectionString
+      - key: API_KEY
+        generateValue: true
+    disk:
+      name: playwright-cache
+      mountPath: /root/.cache/ms-playwright
+      sizeGB: 1
+
+  - type: web
+    name: jellyfin
+    runtime: docker
+    repo: https://github.com/your/repo
+    branch: main
+    dockerfilePath: ./docker/Dockerfile.jellyfin
+    envVars:
+      - key: JELLYFIN_PublishedServerUrl
+        value: https://jellyfin.onrender.com
+    disk:
+      name: jellyfin-config
+      mountPath: /config
+      sizeGB: 10
+
+  - type: redis
+    name: scraper-cache
+    plan: free
+    maxmemoryPolicy: allkeys-lru
