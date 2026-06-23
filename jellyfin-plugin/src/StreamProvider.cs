@@ -40,12 +40,10 @@ public class ScraperStreamProvider : IMediaSourceProvider
             {
                 Id = providerId,
                 Name = details.Title,
-                MediaSourceType = MediaSourceType.Placeholder,
                 MediaStreams = new List<MediaStream>
                 {
-                    new() { Type = MediaStreamType.Video, IsExternal = true, ExternalUrl = bestStream.Url }
+                    new() { Type = MediaStreamType.Video, IsExternal = true, Path = bestStream.Url }
                 },
-                LocationType = MediaLocationType.Remote,
                 Path = bestStream.Url,
                 IsRemote = true,
                 SupportsTranscoding = true,

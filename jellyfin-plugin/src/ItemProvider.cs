@@ -56,7 +56,7 @@ public class ScraperItemProvider
             CommunityRating = 0,
             Genres = item.Genres.ToArray(),
         };
-        movie.SetProviderId("ScraperBridge", item.Id);
+        movie.ProviderIds["ScraperBridge"] = item.Id;
         return movie;
     }
 }
