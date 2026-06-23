@@ -5,7 +5,7 @@ RUN npm install
 COPY scraper-api/ . .
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:20-slim
 RUN npx playwright install chromium --with-deps
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
