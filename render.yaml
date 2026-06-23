@@ -30,7 +30,7 @@ services:
     dockerfilePath: ./docker/Dockerfile.jellyfin
     envVars:
       - key: JELLYFIN_PublishedServerUrl
-        value: https://jellyfin.onrender.com
+        value: https://jellyfin-lm7g.onrender.com
     disk:
       name: jellyfin-config
       mountPath: /config
