@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Library;
