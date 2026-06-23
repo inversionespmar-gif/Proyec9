@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Controller.Entities;
-using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Entities;
+using MediaBrowser.Controller.Entities.Movies;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.ScraperBridge;
 
-public class ScraperItemProvider : IItemResolverProvider
+public class ScraperItemProvider
 {
     private readonly ScraperApiClient _apiClient;
     private readonly ILogger<ScraperItemProvider> _logger;
@@ -26,7 +24,7 @@ public class ScraperItemProvider : IItemResolverProvider
         _cacheDuration = TimeSpan.FromMinutes(cacheMinutes);
     }
 
-    public async Task<IEnumerable<BaseItem>> GetItemsAsync(ItemResolveArgs args, CancellationToken ct)
+    public async Task<List<Movie>> GetItemsAsync(CancellationToken ct)
     {
         if ((DateTime.UtcNow - _lastFetch) > _cacheDuration || _cachedItems.Count == 0)
         {
@@ -40,16 +38,16 @@ public class ScraperItemProvider : IItemResolverProvider
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to fetch library from Scraper API");
-                return Enumerable.Empty<BaseItem>();
+                return new List<Movie>();
             }
         }
 
-        return _cachedItems.Select(MapToBaseItem);
+        return _cachedItems.Select(MapToMovie).ToList();
     }
 
-    private static BaseItem MapToBaseItem(MediaItem item)
+    private static Movie MapToMovie(MediaItem item)
     {
-        return new Movie
+        var movie = new Movie
         {
             Name = item.Title,
             OriginalTitle = item.Title,
@@ -57,10 +55,8 @@ public class ScraperItemProvider : IItemResolverProvider
             ProductionYear = item.Year,
             CommunityRating = 0,
             Genres = item.Genres.ToArray(),
-            ProviderIds = new Dictionary<string, string>
-            {
-                { "ScraperBridge", item.Id }
-            },
         };
+        movie.SetProviderId("ScraperBridge", item.Id);
+        return movie;
     }
 }

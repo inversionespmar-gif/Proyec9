@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using MediaBrowser.Common.Plugins;
+using MediaBrowser.Controller;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
@@ -23,7 +25,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
 public class ServiceRegistrator : IPluginServiceRegistrator
 {
-    public void RegisterServices(IServiceCollection serviceCollection)
+    public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         serviceCollection.AddSingleton<ScraperApiClient>(sp =>
         {
@@ -44,5 +46,6 @@ public class ServiceRegistrator : IPluginServiceRegistrator
             var logger = sp.GetRequiredService<ILogger<ScraperStreamProvider>>();
             return new ScraperStreamProvider(client, logger);
         });
+        serviceCollection.AddSingleton<ILibraryPostScanTask, ScraperLibrarySyncTask>();
     }
 }

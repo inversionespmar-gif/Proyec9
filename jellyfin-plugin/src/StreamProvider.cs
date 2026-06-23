@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Media;
 using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
 using Microsoft.Extensions.Logging;
 
@@ -19,25 +24,38 @@ public class ScraperStreamProvider : IMediaSourceProvider
         _logger = logger;
     }
 
-    public async Task<MediaSourceInfo?> GetMediaSource(string mediaSourceId, string? liveStreamId, CancellationToken ct)
+    public async Task<IEnumerable<MediaSourceInfo>> GetMediaSources(BaseItem item, CancellationToken cancellationToken)
     {
-        var details = await _apiClient.FetchItemDetailsAsync(mediaSourceId);
-        if (details is null || details.Streams.Count == 0) return null;
+        var providerId = item.GetProviderId("ScraperBridge");
+        if (string.IsNullOrEmpty(providerId))
+            return Enumerable.Empty<MediaSourceInfo>();
+
+        var details = await _apiClient.FetchItemDetailsAsync(providerId);
+        if (details is null || details.Streams.Count == 0)
+            return Enumerable.Empty<MediaSourceInfo>();
 
         var bestStream = details.Streams[0];
-        return new MediaSourceInfo
+        return new List<MediaSourceInfo>
         {
-            Id = mediaSourceId,
-            Name = details.Title,
-            MediaSourceType = MediaSourceType.Placeholder,
-            MediaStreams = new System.Collections.Generic.List<MediaStream>
+            new()
             {
-                new() { Type = MediaStreamType.Video, IsExternal = true, ExternalUrl = bestStream.Url }
-            },
-            LocationType = MediaLocationType.Remote,
-            Path = bestStream.Url,
-            IsRemote = true,
-            SupportsTranscoding = true,
+                Id = providerId,
+                Name = details.Title,
+                MediaSourceType = MediaSourceType.Placeholder,
+                MediaStreams = new List<MediaStream>
+                {
+                    new() { Type = MediaStreamType.Video, IsExternal = true, ExternalUrl = bestStream.Url }
+                },
+                LocationType = MediaLocationType.Remote,
+                Path = bestStream.Url,
+                IsRemote = true,
+                SupportsTranscoding = true,
+            }
         };
+    }
+
+    public Task<ILiveStream> OpenMediaSource(string openToken, List<ILiveStream> currentLiveStreams, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }
